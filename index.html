@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>에코링고 (EcoLingo)</title>
+  <style>
+    :root {
+      --primary: #358E4D; /* 에코 그린 */
+      --secondary: #AEC774; /* 연두색 */
+      --bg-color: #FEFEFD; /* 웜 베이지 */
+      --text-main: #2c3e50;
+      --text-light: #596a7b;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --highlight: rgba(174, 199, 116, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .nav-btn.active, .nav-btn:hover {
+      background-color: white;
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 관심 분야 선택 UI */
+    .topic-selector {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .topic-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .topic-tag {
+      padding: 8px 15px;
+      background-color: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .topic-tag.selected {
+      background-color: var(--secondary);
+      color: #1a472a;
+      border-color: var(--primary);
+      font-weight: bold;
+    }
+
+    .custom-topic {
+      display: flex;
+      gap: 10px;
+    }
+
+    .custom-topic input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    button.btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    button.btn-primary:hover {
+      background-color: #276938;
+    }
+
+    /* 카드 공통 스타일 */
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      border-left: 5px solid var(--primary);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .term {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .topics-badge {
+      font-size: 0.8rem;
+      background: var(--secondary);
+      color: #1a472a;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    .meaning {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .news-context {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-left: 3px solid var(--secondary);
+    }
+
+    .news-context em {
+      background-color: var(--highlight);
+      font-style: normal;
+      font-weight: bold;
+      padding: 0 3px;
+    }
+
+    .fusion-section {
+      margin-top: 20px;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 15px;
+    }
+
+    .ko-sentence {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+
+    .en-sentence {
+      margin-bottom: 8px;
+      padding-left: 15px;
+      position: relative;
+      color: var(--text-light);
+    }
+    
+    .en-sentence::before {
+      content: '👉';
+      position: absolute;
+      left: -5px;
+      top: 0;
+    }
+
+    .memo-section {
+      margin-top: 15px;
+    }
+
+    .memo-section textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      resize: vertical;
+      font-size: 0.95rem;
+      background-color: #fafafa;
+    }
+
+    .memo-section textarea:focus {
+      outline: none;
+      border-color: var(--secondary);
+      background-color: white;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+    }
+
+    .btn-done {
+      background-color: var(--secondary);
+      color: #1a472a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: filter 0.2s;
+    }
+
+    .btn-done:hover {
+      filter: brightness(0.95);
+    }
+
+    /* 복습 대시보드 */
+    .dashboard-stats {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-box {
+      flex: 1;
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    /* 검색 영역 */
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid var(--secondary);
+      border-radius: 8px;
+      font-size: 1.1rem;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-light);
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px dashed var(--secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌱 에코링고 (EcoLingo)</h1>
+    <p>나의 관심 분야와 영어를 엮어 만드는 나만의 언어 숲</p>
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="switchTab('learn')">📖 학습 홈</button>
+      <button class="nav-btn" onclick="switchTab('review')">🔄 복습 대시보드</button>
+      <button class="nav-btn" onclick="switchTab('search')">🔍 표현/맥락 검색</button>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- 탭 1: 학습 홈 -->
+    <div id="tab-learn" class="tab-content active">
+      <div class="topic-selector">
+        <h3>1. 관심 분야 선택</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">학습하고 싶은 분야를 선택해주세요. (다중 선택 가능)</p>
+        <div class="topic-tags" id="topic-tags-container">
+          <!-- JS에서 동적 생성 -->
+        </div>
+        <div class="custom-topic">
+          <input type="text" id="new-topic-input" placeholder="새로운 분야 추가 (예: 에듀테크)">
+          <button class="btn-primary" onclick="addCustomTopic()">추가</button>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 30px;">
+        <button class="btn-primary" style="font-size: 1.2rem; padding: 15px 30px;" onclick="loadStudyMaterials()">
+          선택한 분야의 단어 & 실전 문장 학습하기 🚀
+        </button>
+      </div>
+
+      <div id="study-container">
+        <div class="empty-state">
+          위 버튼을 눌러 오늘의 학습을 시작해보세요!
+        </div>
+      </div>
+    </div>
+
+    <!-- 탭 2: 복습 대시보드 -->
+    <div id="tab-review" class="tab-content">
+      <h2>🔄 에빙하우스 복습 대시보드</h2>
+      <p style="margin-bottom: 20px; color: var(--text-light);">망각 곡선에 맞춰(1일, 3일, 7일, 14일, 30일) 오늘 꼭 복습해야 할 항목들입니다.</p>
+      
+      <div class="dashboard-stats">
+        <div class="stat-box">
+          <div class="stat-num" id="today-review-count">0</div>
+          <div>오늘 복습할 항목</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="total-learned-count">0</div>
+          <div>전체 학습 완료 항목</div>
+        </div>
+      </div>
+
+      <div id="review-container">
+        <!-- JS에서 복습 항목 렌더링 -->
+      </div>
+    </div>
+
+    <!-- 탭 3: 상황/단어 검색 -->
+    <div id="tab-search" class="tab-content">
+      <h2>🔍 역방향 표현 검색기</h2>
+      <p style="margin-bottom: 20px; color: var(--text-light);">머릿속에 맴도는 상황이나 우리말 맥락을 입력해보세요. 딱 맞는 실무 영어를 찾아드립니다.</p>
+      
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="예: 친환경인 척 하는 기업, 혹은 정당한 대가..." onkeypress="handleSearchEnter(event)">
+        <button class="btn-primary" onclick="doSearch()">찾기</button>
+      </div>
+
+      <div id="search-results">
+        <div class="empty-state">검색어를 입력하고 찾기 버튼을 눌러주세요.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ==========================================
+    // 🗄️ [가상 데이터 (Mock Data)]
+    // ==========================================
+    let availableTopics = ["환경", "지속가능발전", "공정무역", "민주시민교육", "AI"];
+    let selectedTopics = ["환경", "AI"];
+
+    const vocabData = [
+      { 
+        id: 'v1', topic: '환경', term: 'Greenwashing', meaning: '위장환경주의; 실제로는 친환경적이지 않지만 친환경적인 것처럼 홍보하는 행위', 
+        news: 'The energy giant faced massive backlash over <em>Greenwashing</em> in its latest eco-friendly ad campaign.', 
+        searchKws: ['친환경인척', '환경 생각하는 척', '가짜 친환경', '위장'] 
+      },
+      { 
+        id: 'v2', topic: '지속가능발전', term: 'ESG', meaning: '환경(Environment), 사회(Social), 지배구조(Governance)', 
+        news: 'Global investors are increasingly prioritizing <em>ESG</em> metrics when evaluating long-term corporate performance.', 
+        searchKws: ['지속가능경영', '기업의 사회적 책임', '비재무적 요소', '착한 기업'] 
+      },
+      { 
+        id: 'v3', topic: '공정무역', term: 'Fair Price', meaning: '공정 가격; 생산자에게 정당한 대가를 지불하는 가격', 
+        news: 'The global cooperative guarantees a <em>Fair Price</em> for all cocoa farmers in the developing region.', 
+        searchKws: ['정당한 대가', '제값', '착한 소비', '생산자 보호'] 
+      },
+      { 
+        id: 'v4', topic: 'AI', term: 'Hallucination', meaning: '환각 현상; AI가 거짓이나 검증되지 않은 정보를 마치 사실인 것처럼 제시하는 현상', 
+        news: 'Developers are implementing new filtering layers to reduce <em>Hallucination</em> in large language models.', 
+        searchKws: ['AI가 거짓말', '가짜 정보', '지어내는 현상', '오류'] 
+      },
+      { 
+        id: 'v5', topic: '민주시민교육', term: 'Empowerment', meaning: '역량 강화, 권한 부여; 개인이 자신의 삶과 사회에 대한 통제력을 갖도록 돕는 과정', 
+        news: 'The new community program focuses on the <em>Empowerment</em> of marginalized youth through digital literacy.', 
+        searchKws: ['주체성', '시민의식 성장', '권리 부여', '역량 키우기'] 
+      }
+    ];
+
+    const fusionData = [
+      {
+        id: 'f1',
+        topics: ['지속가능발전', 'AI'],
+        ko_sentence: '이번 지속가능발전 프로젝트의 핵심은 AI 리터러시를 기반으로 한 그린워싱 판별입니다.',
+        en_sentences: [
+          'The core of this sustainability project is identifying greenwashing based on AI literacy.',
+          'We’re focusing on using AI literacy to spot greenwashing in our new sustainability initiative.'
+        ],
+        searchKws: ['인공지능으로 친환경 판별', '그린워싱 찾기']
+      },
+      {
+        id: 'f2',
+        topics: ['환경', '공정무역'],
+        ko_sentence: '친환경 패키징 도입과 함께 생산자에게 Fair Price를 보장하는 서플라이 체인을 구축해야 합니다.',
+        en_sentences: [
+          'Along with adopting eco-friendly packaging, we must build a supply chain that guarantees a fair price for producers.',
+          'It’s crucial to uphold fair price principles while shifting to green packaging across our supply chain.'
+        ],
+        searchKws: ['친환경 포장과 정당한 대가', '환경 보호와 생산자']
+      },
+      {
+        id: 'f3',
+        topics: ['민주시민교육', 'AI'],
+        ko_sentence: 'AI 환각(Hallucination)의 위험성을 인지하고 비판적으로 수용하는 것이 현대 시민의 Empowerment 과정입니다.',
+        en_sentences: [
+          'Recognizing the risks of AI hallucination and accepting information critically is a process of modern citizen empowerment.',
+          'Empowering modern citizens means teaching them to think critically about the risks of AI hallucinations.'
+        ],
+        searchKws: ['AI 거짓말 비판적 수용', '시민 역량 강화']
+      }
+    ];
+
+    // ==========================================
+    // 🧠 [학습 데이터 및 로컬 스토리지 관리]
+    // ==========================================
+    // review record format: { id: 'v1', type: 'vocab', step: 1, nextReviewDate: timestamp }
+    // intervals in days: 1, 3, 7, 14, 30
+    const intervals = [1, 3, 7, 14, 30]; 
+
+    function getReviews() {
+      return JSON.parse(localStorage.getItem('ecolingo_reviews') || '[]');
+    }
+
+    function saveReviews(reviews) {
+      localStorage.setItem('ecolingo_reviews', JSON.stringify(reviews));
+    }
+
+    function getMemos() {
+      return JSON.parse(localStorage.getItem('ecolingo_memos') || '{}');
+    }
+
+    function saveMemoObj(memos) {
+      localStorage.setItem('ecolingo_memos', JSON.stringify(memos));
+    }
+
+    function markAsLearned(id, type) {
+      let reviews = getReviews();
+      let existing = reviews.find(r => r.id === id);
+      const now = new Date().getTime();
+      
+      if (existing) {
+        if (existing.step < intervals.length) {
+          existing.nextReviewDate = now + (intervals[existing.step] * 24 * 60 * 60 * 1000);
+          existing.step++;
+        } else {
+          existing.nextReviewDate = now + (30 * 24 * 60 * 60 * 1000); // 30일 후 계속 반복
+        }
+      } else {
+        reviews.push({
+          id: id,
+          type: type,
+          step: 1, // 방금 처음 학습했으므로 1단계 (1일 후 복습)
+          nextReviewDate: now + (1 * 24 * 60 * 60 * 1000)
+        });
+      }
+      saveReviews(reviews);
+      alert('✅ 학습 완료! 에빙하우스 주기에 따라 다음 복습일에 알려드릴게요.');
+      updateDashboardStats();
+    }
+
+    function saveMemoText(id, text) {
+      let memos = getMemos();
+      memos[id] = text;
+      saveMemoObj(memos);
+    }
+
+    // ==========================================
+    // 🎨 [UI 렌더링 함수들]
+    // ==========================================
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+
+      if(tabId === 'review') renderReviewDashboard();
+    }
+
+    function renderTopicTags() {
+      const container = document.getElementById('topic-tags-container');
+      container.innerHTML = '';
+      availableTopics.forEach(topic => {
+        const div = document.createElement('div');
+        div.className = `topic-tag ${selectedTopics.includes(topic) ? 'selected' : ''}`;
+        div.textContent = topic;
+        div.onclick = () => toggleTopic(topic);
+        container.appendChild(div);
+      });
+    }
+
+    function toggleTopic(topic) {
+      if (selectedTopics.includes(topic)) {
+        selectedTopics = selectedTopics.filter(t => t !== topic);
+      } else {
+        selectedTopics.push(topic);
+      }
+      renderTopicTags();
+    }
+
+    function addCustomTopic() {
+      const input = document.getElementById('new-topic-input');
+      const val = input.value.trim();
+      if (val && !availableTopics.includes(val)) {
+        availableTopics.push(val);
+        selectedTopics.push(val);
+        input.value = '';
+        renderTopicTags();
+      }
+    }
+
+    // 카드 생성 컴포넌트
+    function createVocabCard(item) {
+      const memos = getMemos();
+      const memoText = memos[item.id] || '';
+      
+      return `
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="term">${item.term}</div>
+              <div class="meaning">${item.meaning}</div>
+            </div>
+            <span class="topics-badge">${item.topic}</span>
+          </div>
+          <div class="news-context">
+            <strong>📰 뉴스/실무 문맥:</strong><br>
+            ${item.news}
+          </div>
+          <div class="memo-section">
+            <textarea placeholder="💡 이 단어를 활용해 나만의 문장을 만들어보거나, 떠오르는 생각을 자유롭게 메모하세요..." onblur="saveMemoText('${item.id}', this.value)">${memoText}</textarea>
+          </div>
+          <div class="action-row">
+            <button class="btn-done" onclick="markAsLearned('${item.id}', 'vocab')">
+              ✔️ 학습 완료 (복습 등록)
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function createFusionCard(item) {
+      const memos = getMemos();
+      const memoText = memos[item.id] || '';
+      
+      let enHTML = item.en_sentences.map(en => `<div class="en-sentence">${en}</div>`).join('');
+
+      return `
+        <div class="card" style="border-left-color: #a33327;">
+          <div class="card-header">
+            <div class="term" style="color: #a33327; font-size: 1.3rem;">🔥 융합형 실전 문장</div>
+            <span class="topics-badge" style="background:#fde68a;">${item.topics.join(' + ')}</span>
+          </div>
+          
+          <div class="fusion-section" style="border:none; margin-top:0; padding-top:0;">
+            <p style="margin-bottom: 5px; font-size: 0.9rem; color: var(--text-light);">🇰🇷 실무형 한국어 혼용 문장</p>
+            <div class="ko-sentence">"${item.ko_sentence}"</div>
+            
+            <p style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-light);">🇺🇸 원어민 실생활/영화 대사형 표현</p>
+            ${enHTML}
+          </div>
+
+          <div class="memo-section">
+            <textarea placeholder="💡 이 실전 문장을 어떻게 응용할 수 있을까요? 메모를 남겨보세요." onblur="saveMemoText('${item.id}', this.value)">${memoText}</textarea>
+          </div>
+          <div class="action-row">
+            <button class="btn-done" style="background:#fde68a;" onclick="markAsLearned('${item.id}', 'fusion')">
+              ✔️ 학습 완료 (복습 등록)
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 학습 홈 렌더링
+    function loadStudyMaterials() {
+      if (selectedTopics.length === 0) {
+        alert("최소 한 개 이상의 관심 분야를 선택해주세요!");
+        return;
+      }
+      
+      const container = document.getElementById('study-container');
+      container.innerHTML = '';
+
+      // 선택한 분야의 단어 필터링
+      const matchedVocab = vocabData.filter(v => selectedTopics.includes(v.topic));
+      // 선택한 분야가 하나라도 포함된 융합 문장 필터링
+      const matchedFusion = fusionData.filter(f => f.topics.some(t => selectedTopics.includes(t)));
+
+      let html = '';
+      
+      if (matchedVocab.length > 0) {
+        html += `<h3 style="margin-bottom:15px; color: var(--primary);">📚 오늘의 실무 영단어</h3>`;
+        matchedVocab.forEach(item => { html += createVocabCard(item); });
+      }
+
+      if (matchedFusion.length > 0) {
+        html += `<h3 style="margin-top:30px; margin-bottom:15px; color: #a33327;">🔗 관심 분야 융합 실전 문장</h3>`;
+        matchedFusion.forEach(item => { html += createFusionCard(item); });
+      }
+
+      if (html === '') {
+        html = `<div class="empty-state">해당 분야의 준비된 학습 데이터가 없습니다. 기본 분야(환경, AI 등)를 선택해보세요!</div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    // 복습 대시보드 렌더링
+    function updateDashboardStats() {
+      const reviews = getReviews();
+      document.getElementById('total-learned-count').textContent = reviews.length;
+      
+      const now = new Date().getTime();
+      const todayReviews = reviews.filter(r => r.nextReviewDate <= now);
+      document.getElementById('today-review-count').textContent = todayReviews.length;
+    }
+
+    function renderReviewDashboard() {
+      updateDashboardStats();
+      const container = document.getElementById('review-container');
+      const reviews = getReviews();
+      const now = new Date().getTime();
+      const todayReviews = reviews.filter(r => r.nextReviewDate <= now);
+
+      if (todayReviews.length === 0) {
+        container.innerHTML = `<div class="empty-state">훌륭합니다! 오늘 배정된 복습 분량을 모두 완료했거나, 아직 복습할 항목이 없습니다.</div>`;
+        return;
+      }
+
+      let html = '';
+      todayReviews.forEach(r => {
+        let item = null;
+        let isFusion = false;
+        
+        if(r.type === 'vocab') item = vocabData.find(v => v.id === r.id);
+        else {
+          item = fusionData.find(f => f.id === r.id);
+          isFusion = true;
+        }
+
+        if(item) {
+          html += `<div style="position:relative;">
+            <div style="position:absolute; top: 15px; right: 25px; background:#e2e8f0; padding:4px 10px; border-radius:12px; font-size:0.8rem; font-weight:bold;">현재 ${r.step}단계 복습 중</div>
+            ${isFusion ? createFusionCard(item) : createVocabCard(item)}
+          </div>`;
+        }
+      });
+      container.innerHTML = html;
+    }
+
+    // 검색 기능
+    function handleSearchEnter(e) {
+      if(e.key === 'Enter') doSearch();
+    }
+
+    function doSearch() {
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const container = document.getElementById('search-results');
+      
+      if (!query) {
+        container.innerHTML = `<div class="empty-state">검색어를 입력해주세요.</div>`;
+        return;
+      }
+
+      let html = '';
+      
+      // 단어 검색
+      const foundVocab = vocabData.filter(v => 
+        v.term.toLowerCase().includes(query) || 
+        v.meaning.includes(query) || 
+        v.searchKws.some(k => k.includes(query))
+      );
+
+      // 문장 검색
+      const foundFusion = fusionData.filter(f => 
+        f.ko_sentence.includes(query) || 
+        f.en_sentences.some(en => en.toLowerCase().includes(query)) ||
+        f.searchKws.some(k => k.includes(query))
+      );
+
+      if (foundVocab.length > 0) {
+        html += `<h3 style="margin-bottom:15px;">🔍 단어 검색 결과 (${foundVocab.length}건)</h3>`;
+        foundVocab.forEach(item => { html += createVocabCard(item); });
+      }
+
+      if (foundFusion.length > 0) {
+        html += `<h3 style="margin-top:20px; margin-bottom:15px;">🔍 융합 문장 검색 결과 (${foundFusion.length}건)</h3>`;
+        foundFusion.forEach(item => { html += createFusionCard(item); });
+      }
+
+      if (html === '') {
+        html = `<div class="empty-state">"${query}"에 대한 검색 결과가 없습니다.<br>다른 맥락이나 단어로 검색해보세요!</div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    // 초기화
+    window.onload = () => {
+      renderTopicTags();
+      updateDashboardStats();
+    };
+
+  </script>
+</body>
+</html>
